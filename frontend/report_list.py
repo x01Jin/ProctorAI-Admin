@@ -1,9 +1,7 @@
 from PyQt6.QtWidgets import QWidget, QVBoxLayout, QTableWidget, QTableWidgetItem, QHeaderView, QAbstractItemView, QMessageBox
-from PyQt6.QtCore import QTimer, Qt
+from PyQt6.QtCore import Qt
 
 class ReportList(QWidget):
-    REFRESH_INTERVAL = 5000
-
     def __init__(self, db, parent=None):
         super().__init__(parent)
         self.db = db
@@ -21,9 +19,6 @@ class ReportList(QWidget):
         self.layout.addWidget(self.table)
         self.setLayout(self.layout)
         self.current_proctor_id = None
-        self.refresh_timer = QTimer(self)
-        self.refresh_timer.timeout.connect(self.refresh_reports)
-        self.refresh_timer.start(self.REFRESH_INTERVAL)
 
     def display_reports(self, proctor_id):
         self.current_proctor_id = proctor_id
@@ -59,7 +54,3 @@ class ReportList(QWidget):
             f"Students: {report['num_students']}\n"
         )
         QMessageBox.information(self, "Report Details", details)
-
-    def refresh_reports(self):
-        if self.current_proctor_id is not None:
-            self.display_reports(self.current_proctor_id)

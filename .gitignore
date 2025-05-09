@@ -128,6 +128,7 @@ ENV/
 env.bak/
 venv.bak/
 .roo
+.clinerules
 
 # Spyder project settings
 .spyderproject

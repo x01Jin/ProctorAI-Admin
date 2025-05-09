@@ -1,5 +1,5 @@
 from PyQt6.QtWidgets import QApplication, QMainWindow, QWidget, QHBoxLayout, QSplitter
-from PyQt6.QtCore import Qt
+from PyQt6.QtCore import Qt, QTimer
 from frontend.toolbar import Toolbar
 from frontend.proctor_list import ProctorList
 from frontend.proctor_profile import ProctorProfile
@@ -19,7 +19,22 @@ class AdminMainWindow(QMainWindow):
         self.toolbar = Toolbar(self)
         self.setMenuWidget(self.toolbar)
         self._init_ui()
-        self.toolbar.refresh_requested.connect(self._refresh_all)
+        self.toolbar.refresh_requested.connect(self._force_refresh_all)
+        self._refresh_timer = QTimer(self)
+        self._refresh_timer.timeout.connect(self._force_refresh_all)
+        self._refresh_timer.start(5000)
+
+    def _force_refresh_all(self):
+        try:
+            self.db.connect()
+        except Exception:
+            pass
+        self.proctor_list.refresh()
+        current_item = self.proctor_list.currentItem()
+        if current_item:
+            proctor_id = current_item.data(Qt.ItemDataRole.UserRole)
+            self.proctor_profile.display_proctor(proctor_id)
+            self.report_list.display_reports(proctor_id)
 
     def _init_ui(self):
         self.main_widget = QWidget()
@@ -53,13 +68,6 @@ class AdminMainWindow(QMainWindow):
             proctor_id = current_item.data(Qt.ItemDataRole.UserRole)
             self._on_proctor_selected(proctor_id)
 
-    def _refresh_all(self):
-        self.proctor_list.refresh()
-        current_item = self.proctor_list.currentItem()
-        if current_item:
-            proctor_id = current_item.data(Qt.ItemDataRole.UserRole)
-            self._on_proctor_selected(proctor_id)
-        
     def _on_proctor_selected(self, proctor_id):
         self.proctor_profile.display_proctor(proctor_id)
         self.report_list.display_reports(proctor_id)
