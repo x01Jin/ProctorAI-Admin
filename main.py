@@ -8,6 +8,7 @@ from backend.auth import AdminLoginDialog
 from backend.db import Database
 from themes.theme import apply_fusion_dark_theme
 import sys
+import logs
 
 class AdminMainWindow(QMainWindow):
     def __init__(self, db):
@@ -57,6 +58,7 @@ class AdminMainWindow(QMainWindow):
 
 
 def main():
+    logs.setup_logger()
     app = QApplication(sys.argv)
     apply_fusion_dark_theme(app)
     db = Database()
