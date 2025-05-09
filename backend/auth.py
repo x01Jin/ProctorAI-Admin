@@ -30,15 +30,15 @@ class AdminLoginDialog(QDialog):
         if not username or not password:
             QMessageBox.warning(self, "Login Failed", "Please enter both username and password.")
             return
-        admin = self.db.get_admin()
-        if not admin:
+        admins = self.db.get_admin()
+        if not admins:
             QMessageBox.critical(self, "Login Failed", "Admin account not found in database.")
             return
-        if admin.get("user_role") != "admin":
-            QMessageBox.critical(self, "Login Failed", "This account is not an administrator.")
-            return
         password_hash = hashlib.sha256(password.encode()).hexdigest()
-        if (username != admin["proctor_name"] and username != admin["email"]) or admin["password"] != password_hash:
-            QMessageBox.warning(self, "Login Failed", "Invalid username or password.")
-            return
-        self.accept()
+        for admin in admins:
+            if admin.get("user_role") == "admin" and \
+               (username == admin["proctor_name"] or username == admin["email"]) and \
+               admin["password"] == password_hash:
+                self.accept()
+                return
+        QMessageBox.warning(self, "Login Failed", "Invalid username or password.")

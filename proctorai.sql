@@ -26,3 +26,11 @@ CREATE TABLE `reportlog` (
   PRIMARY KEY (`id`),
   CONSTRAINT `fk_reportlog_user` FOREIGN KEY (`user_id`) REFERENCES `users`(`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- sample admin user with a hashed password of 'administrator'
+-- Note: The password is hashed using SHA256.
+-- username: admin
+-- email: admin@example.com
+-- password: administrator
+INSERT INTO users (proctor_name, email, password, user_role)
+VALUES ('admin', 'admin@example.com', '4194d1706ed1f408d5e02d672777019f4d5385c766a8c6ca8acba3167d36a7b9', 'admin');

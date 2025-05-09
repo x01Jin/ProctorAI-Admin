@@ -89,7 +89,7 @@ class Database:
 
     def get_admin(self):
         if not self.is_connected():
-            return None
+            return []
         with self._connection.cursor(dictionary=True) as cursor:
             cursor.execute("SELECT * FROM users WHERE user_role = 'admin'")
-            return cursor.fetchone()
+            return cursor.fetchall()
