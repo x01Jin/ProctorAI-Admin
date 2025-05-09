@@ -5,6 +5,7 @@ from frontend.proctor_profile import ProctorProfile
 from frontend.report_list import ReportList
 from backend.auth import AdminLoginDialog
 from backend.db import Database
+from themes.theme import apply_fusion_dark_theme
 import sys
 
 class AdminMainWindow(QMainWindow):
@@ -12,7 +13,7 @@ class AdminMainWindow(QMainWindow):
         super().__init__()
         self.db = db
         self.setWindowTitle("ProctorAI Administrator Interface")
-        self.setMinimumSize(1200, 700)
+        self.setMinimumSize(1280, 720)
         self.toolbar = Toolbar(self)
         self.setMenuWidget(self.toolbar)
         self._init_ui()
@@ -47,8 +48,9 @@ class AdminMainWindow(QMainWindow):
 
 def main():
     app = QApplication(sys.argv)
+    apply_fusion_dark_theme(app)
     db = Database()
-    db.connect() #???????????????????????????????????????????????????
+    db.connect()
     login = AdminLoginDialog(db)
     if login.exec() != 1:
         sys.exit(0)
