@@ -1,14 +1,17 @@
 from PyQt6.QtWidgets import QWidget, QVBoxLayout, QTableWidget, QTableWidgetItem, QHeaderView, QAbstractItemView, QMessageBox
+from PyQt6.QtCore import QTimer, Qt
 
 class ReportList(QWidget):
+    REFRESH_INTERVAL = 5000
+
     def __init__(self, db, parent=None):
         super().__init__(parent)
         self.db = db
         self.layout = QVBoxLayout(self)
         self.table = QTableWidget()
-        self.table.setColumnCount(8)
+        self.table.setColumnCount(7)
         self.table.setHorizontalHeaderLabels([
-            "ID", "Block", "Subject", "Room", "Start", "End", "Date", "Students"
+            "Block", "Subject", "Room", "Start", "End", "Date", "Students"
         ])
         self.table.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
         self.table.setEditTriggers(QAbstractItemView.EditTrigger.NoEditTriggers)
@@ -17,23 +20,30 @@ class ReportList(QWidget):
         self.table.cellDoubleClicked.connect(self._show_report_details)
         self.layout.addWidget(self.table)
         self.setLayout(self.layout)
+        self.current_proctor_id = None
+        self.refresh_timer = QTimer(self)
+        self.refresh_timer.timeout.connect(self.refresh_reports)
+        self.refresh_timer.start(self.REFRESH_INTERVAL)
 
     def display_reports(self, proctor_id):
+        self.current_proctor_id = proctor_id
         self.table.setRowCount(0)
         reports = self.db.get_reports_for_proctor(proctor_id)
         for row, report in enumerate(reports):
             self.table.insertRow(row)
-            self.table.setItem(row, 0, QTableWidgetItem(str(report["id"])))
-            self.table.setItem(row, 1, QTableWidgetItem(report["block"]))
-            self.table.setItem(row, 2, QTableWidgetItem(report["subject"]))
-            self.table.setItem(row, 3, QTableWidgetItem(report["room"]))
-            self.table.setItem(row, 4, QTableWidgetItem(str(report["start"])))
-            self.table.setItem(row, 5, QTableWidgetItem(str(report["end"])))
-            self.table.setItem(row, 6, QTableWidgetItem(str(report["date"])))
-            self.table.setItem(row, 7, QTableWidgetItem(str(report["num_students"])))
+            item_block = QTableWidgetItem(report["block"])
+            item_block.setData(Qt.ItemDataRole.UserRole, report["id"])
+            self.table.setItem(row, 0, item_block)
+            self.table.setItem(row, 1, QTableWidgetItem(report["subject"]))
+            self.table.setItem(row, 2, QTableWidgetItem(report["room"]))
+            self.table.setItem(row, 3, QTableWidgetItem(str(report["start"])))
+            self.table.setItem(row, 4, QTableWidgetItem(str(report["end"])))
+            self.table.setItem(row, 5, QTableWidgetItem(str(report["date"])))
+            self.table.setItem(row, 6, QTableWidgetItem(str(report["num_students"])))
 
     def _show_report_details(self, row, column):
-        report_id = int(self.table.item(row, 0).text())
+        item = self.table.item(row, 0)
+        report_id = item.data(Qt.ItemDataRole.UserRole)
         report = self.db.get_report(report_id)
         if not report:
             QMessageBox.critical(self, "Error", "Failed to load report details.")
@@ -49,3 +59,7 @@ class ReportList(QWidget):
             f"Students: {report['num_students']}\n"
         )
         QMessageBox.information(self, "Report Details", details)
+
+    def refresh_reports(self):
+        if self.current_proctor_id is not None:
+            self.display_reports(self.current_proctor_id)
