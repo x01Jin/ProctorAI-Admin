@@ -12,15 +12,38 @@ class ProctorList(QListWidget):
         self.itemClicked.connect(self._on_item_clicked)
         self.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.customContextMenuRequested.connect(self._show_context_menu)
+        self.initial_load = True
         self.refresh()
 
     def refresh(self):
+        current_id = None
+        current_item = self.currentItem()
+        if current_item:
+            current_id = current_item.data(Qt.ItemDataRole.UserRole)
+        
         self.clear()
         proctors = self.db.get_proctors()
-        for proctor in proctors:
+        
+        if not proctors:
+            return
+
+        selected_row = 0
+        for idx, proctor in enumerate(proctors):
             item = QListWidgetItem(proctor["proctor_name"])
             item.setData(Qt.ItemDataRole.UserRole, proctor["id"])
             self.addItem(item)
+            if current_id is not None and proctor["id"] == current_id:
+                selected_row = idx
+
+        if self.initial_load:
+            self.initial_load = False
+            selected_row = 0
+            
+        self.setCurrentRow(selected_row)
+        item = self.item(selected_row)
+        if item:
+            proctor_id = item.data(Qt.ItemDataRole.UserRole)
+            self.proctor_selected.emit(proctor_id)
 
     def _on_item_clicked(self, item):
         proctor_id = item.data(Qt.ItemDataRole.UserRole)

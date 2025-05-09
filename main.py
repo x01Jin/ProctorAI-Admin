@@ -47,10 +47,18 @@ class AdminMainWindow(QMainWindow):
         
         self.proctor_list.proctor_selected.connect(self._on_proctor_selected)
         self.toolbar.add_proctor_requested.connect(self.proctor_list.open_add_dialog)
+        
+        current_item = self.proctor_list.currentItem()
+        if current_item:
+            proctor_id = current_item.data(Qt.ItemDataRole.UserRole)
+            self._on_proctor_selected(proctor_id)
 
     def _refresh_all(self):
         self.proctor_list.refresh()
-        self.report_list.refresh_reports()
+        current_item = self.proctor_list.currentItem()
+        if current_item:
+            proctor_id = current_item.data(Qt.ItemDataRole.UserRole)
+            self._on_proctor_selected(proctor_id)
         
     def _on_proctor_selected(self, proctor_id):
         self.proctor_profile.display_proctor(proctor_id)
