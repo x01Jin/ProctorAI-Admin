@@ -1,0 +1,33 @@
+from PyQt6.QtGui import QPalette, QColor
+
+def apply_dark_theme(app):
+    palette = QPalette()
+    palette.setColor(QPalette.ColorRole.Window, QColor(40, 40, 40))
+    palette.setColor(QPalette.ColorRole.WindowText, QColor(220, 220, 220))
+    palette.setColor(QPalette.ColorRole.Base, QColor(30, 30, 30))
+    palette.setColor(QPalette.ColorRole.AlternateBase, QColor(50, 50, 50))
+    palette.setColor(QPalette.ColorRole.ToolTipBase, QColor(255, 255, 220))
+    palette.setColor(QPalette.ColorRole.ToolTipText, QColor(40, 40, 40))
+    palette.setColor(QPalette.ColorRole.Text, QColor(220, 220, 220))
+    palette.setColor(QPalette.ColorRole.Button, QColor(50, 50, 50))
+    palette.setColor(QPalette.ColorRole.ButtonText, QColor(220, 220, 220))
+    palette.setColor(QPalette.ColorRole.BrightText, QColor(255, 0, 0))
+    palette.setColor(QPalette.ColorRole.Highlight, QColor(60, 120, 200))
+    palette.setColor(QPalette.ColorRole.HighlightedText, QColor(255, 255, 255))
+    app.setPalette(palette)
+
+def apply_light_theme(app):
+    palette = QPalette()
+    palette.setColor(QPalette.ColorRole.Window, QColor(245, 245, 245))
+    palette.setColor(QPalette.ColorRole.WindowText, QColor(30, 30, 30))
+    palette.setColor(QPalette.ColorRole.Base, QColor(255, 255, 255))
+    palette.setColor(QPalette.ColorRole.AlternateBase, QColor(240, 240, 240))
+    palette.setColor(QPalette.ColorRole.ToolTipBase, QColor(255, 255, 220))
+    palette.setColor(QPalette.ColorRole.ToolTipText, QColor(30, 30, 30))
+    palette.setColor(QPalette.ColorRole.Text, QColor(30, 30, 30))
+    palette.setColor(QPalette.ColorRole.Button, QColor(240, 240, 240))
+    palette.setColor(QPalette.ColorRole.ButtonText, QColor(30, 30, 30))
+    palette.setColor(QPalette.ColorRole.BrightText, QColor(255, 0, 0))
+    palette.setColor(QPalette.ColorRole.Highlight, QColor(60, 120, 200))
+    palette.setColor(QPalette.ColorRole.HighlightedText, QColor(255, 255, 255))
+    app.setPalette(palette)
