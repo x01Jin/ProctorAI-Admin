@@ -26,7 +26,9 @@ class AdminMainWindow(QMainWindow):
         profile_layout = QSplitter()
         self.proctor_profile = ProctorProfile(self.db, self)
         self.report_list = ReportList(self.db, self)
-        profile_layout.setOrientation(2)  # Qt.Vertical
+        from PyQt6.QtCore import Qt
+        print(type(profile_layout), "setOrientation arg:", Qt.Orientation.Vertical)
+        profile_layout.setOrientation(Qt.Orientation.Vertical)
         profile_layout.addWidget(self.proctor_profile)
         profile_layout.addWidget(self.report_list)
         self.profile_panel.setLayout(QHBoxLayout())
