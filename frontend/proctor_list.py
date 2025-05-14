@@ -76,12 +76,24 @@ class ProctorList(QListWidget):
             self.refresh()
 
     def _confirm_delete(self, proctor_id, proctor_name):
-        if confirm_proctor_deletion(self, proctor_name):
-            success, error_msg = self.db.delete_proctor(proctor_id)
+        # Get report count first for confirmation
+        reports = self.db.get_reports_for_proctor(proctor_id)
+        report_count = len(reports)
+        
+        if confirm_proctor_deletion(self, proctor_name, report_count):
+            success, msg = self.db.delete_proctor(proctor_id)
             if success:
-                
+                QMessageBox.information(
+                    self,
+                    "Success",
+                    f"Successfully deleted proctor '{proctor_name}' and {msg}"
+                )
                 self.clearSelection()
-                self.proctor_selected.emit(-1)  
+                self.proctor_selected.emit(-1)
                 self.refresh()
             else:
-                QMessageBox.critical(self, "Error", f"Failed to delete proctor: {error_msg}")
+                QMessageBox.critical(
+                    self,
+                    "Error",
+                    f"Failed to delete proctor: {msg}"
+                )

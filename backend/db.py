@@ -67,13 +67,25 @@ class Database:
             return False, "Database not connected"
         try:
             with self._connection.cursor() as cursor:
+                # Start transaction
+                self._connection.start_transaction()
+                
+                # Get report count first for verification
+                cursor.execute("SELECT COUNT(*) FROM reportlog WHERE user_id = %s", (proctor_id,))
+                report_count = cursor.fetchone()[0]
+                
+                # Perform deletion (CASCADE will handle reports)
                 cursor.execute("DELETE FROM users WHERE id = %s", (proctor_id,))
                 if cursor.rowcount == 0:
+                    self._connection.rollback()
                     return False, "Proctor not found"
+                
                 self._connection.commit()
-                return True, None
+                return True, f"{report_count} reports deleted"
+                
         except Error as e:
             self._connection.rollback()
+            print(f"MySQL Error [{e.errno}]: {e.msg}")  # Detailed error logging
             return False, f"Database error: {str(e)}"
 
     def get_reports_for_proctor(self, proctor_id):
