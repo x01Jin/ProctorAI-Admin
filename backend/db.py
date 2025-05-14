@@ -64,11 +64,17 @@ class Database:
 
     def delete_proctor(self, proctor_id):
         if not self.is_connected():
-            return False
-        with self._connection.cursor() as cursor:
-            cursor.execute("DELETE FROM users WHERE id = %s", (proctor_id,))
-            self._connection.commit()
-            return True
+            return False, "Database not connected"
+        try:
+            with self._connection.cursor() as cursor:
+                cursor.execute("DELETE FROM users WHERE id = %s", (proctor_id,))
+                if cursor.rowcount == 0:
+                    return False, "Proctor not found"
+                self._connection.commit()
+                return True, None
+        except Error as e:
+            self._connection.rollback()
+            return False, f"Database error: {str(e)}"
 
     def get_reports_for_proctor(self, proctor_id):
         if not self.is_connected():

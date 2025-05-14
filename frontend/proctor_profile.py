@@ -22,5 +22,8 @@ class ProctorProfile(QWidget):
             self.name_label.setText(proctor["proctor_name"])
             self.email_label.setText(proctor["email"])
         else:
-            self.name_label.setText("")
-            self.email_label.setText("")
+            self.clear()
+            
+    def clear(self):
+        self.name_label.setText("")
+        self.email_label.setText("")

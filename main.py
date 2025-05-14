@@ -29,10 +29,17 @@ class AdminMainWindow(QMainWindow):
             self.db.connect()
         except Exception:
             pass
+        
         self.proctor_list.refresh()
         current_item = self.proctor_list.currentItem()
-        if current_item:
-            proctor_id = current_item.data(Qt.ItemDataRole.UserRole)
+        
+        if not current_item:
+            self.proctor_profile.clear()
+            self.report_list.clear()
+            return
+            
+        proctor_id = current_item.data(Qt.ItemDataRole.UserRole)
+        if proctor_id and proctor_id > 0:
             self.proctor_profile.display_proctor(proctor_id)
             self.report_list.display_reports(proctor_id)
 
@@ -69,8 +76,12 @@ class AdminMainWindow(QMainWindow):
             self._on_proctor_selected(proctor_id)
 
     def _on_proctor_selected(self, proctor_id):
-        self.proctor_profile.display_proctor(proctor_id)
-        self.report_list.display_reports(proctor_id)
+        if proctor_id == -1:  
+            self.proctor_profile.clear()
+            self.report_list.clear()
+        else:
+            self.proctor_profile.display_proctor(proctor_id)
+            self.report_list.display_reports(proctor_id)
 
 
 def main():

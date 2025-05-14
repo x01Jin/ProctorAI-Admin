@@ -1,5 +1,7 @@
 from PyQt6.QtWidgets import QListWidget, QListWidgetItem, QMenu, QMessageBox
 from PyQt6.QtCore import pyqtSignal, Qt
+from .proctor_editor import ProctorEditorDialog
+from .utils import confirm_proctor_deletion
 
 class ProctorList(QListWidget):
     proctor_selected = pyqtSignal(int)
@@ -64,21 +66,22 @@ class ProctorList(QListWidget):
             self._confirm_delete(proctor_id, item.text())
 
     def open_add_dialog(self):
-        from .proctor_editor import ProctorEditorDialog
         dialog = ProctorEditorDialog(self.db, parent=self)
         if dialog.exec() == 1:
             self.refresh()
 
     def open_edit_dialog(self, proctor_id):
-        from .proctor_editor import ProctorEditorDialog
         dialog = ProctorEditorDialog(self.db, proctor_id=proctor_id, parent=self)
         if dialog.exec() == 1:
             self.refresh()
 
     def _confirm_delete(self, proctor_id, proctor_name):
-        from .utils import confirm_proctor_deletion
         if confirm_proctor_deletion(self, proctor_name):
-            if self.db.delete_proctor(proctor_id):
+            success, error_msg = self.db.delete_proctor(proctor_id)
+            if success:
+                
+                self.clearSelection()
+                self.proctor_selected.emit(-1)  
                 self.refresh()
             else:
-                QMessageBox.critical(self, "Error", "Failed to delete proctor.")
+                QMessageBox.critical(self, "Error", f"Failed to delete proctor: {error_msg}")

@@ -20,7 +20,15 @@ class ReportList(QWidget):
         self.setLayout(self.layout)
         self.current_proctor_id = None
 
+    def clear(self):
+        self.current_proctor_id = None
+        self.table.setRowCount(0)
+        
     def display_reports(self, proctor_id):
+        if not proctor_id or proctor_id < 0:
+            self.clear()
+            return
+            
         self.current_proctor_id = proctor_id
         self.table.setRowCount(0)
         reports = self.db.get_reports_for_proctor(proctor_id)
