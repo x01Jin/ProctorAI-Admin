@@ -1,7 +1,6 @@
-from PyQt6.QtWidgets import QListWidget, QListWidgetItem, QMenu, QMessageBox
+from PyQt6.QtWidgets import QListWidget, QListWidgetItem, QMenu
 from PyQt6.QtCore import pyqtSignal, Qt
 from .proctor_editor import ProctorEditorDialog
-from .utils import confirm_proctor_deletion
 
 class ProctorList(QListWidget):
     proctor_selected = pyqtSignal(int)
@@ -58,12 +57,9 @@ class ProctorList(QListWidget):
         proctor_id = item.data(Qt.ItemDataRole.UserRole)
         menu = QMenu(self)
         edit_action = menu.addAction("Edit Proctor")
-        delete_action = menu.addAction("Delete Proctor")
         action = menu.exec(self.mapToGlobal(pos))
         if action == edit_action:
             self.open_edit_dialog(proctor_id)
-        elif action == delete_action:
-            self._confirm_delete(proctor_id, item.text())
 
     def open_add_dialog(self):
         dialog = ProctorEditorDialog(self.db, parent=self)
@@ -74,26 +70,3 @@ class ProctorList(QListWidget):
         dialog = ProctorEditorDialog(self.db, proctor_id=proctor_id, parent=self)
         if dialog.exec() == 1:
             self.refresh()
-
-    def _confirm_delete(self, proctor_id, proctor_name):
-        # Get report count first for confirmation
-        reports = self.db.get_reports_for_proctor(proctor_id)
-        report_count = len(reports)
-        
-        if confirm_proctor_deletion(self, proctor_name, report_count):
-            success, msg = self.db.delete_proctor(proctor_id)
-            if success:
-                QMessageBox.information(
-                    self,
-                    "Success",
-                    f"Successfully deleted proctor '{proctor_name}' and {msg}"
-                )
-                self.clearSelection()
-                self.proctor_selected.emit(-1)
-                self.refresh()
-            else:
-                QMessageBox.critical(
-                    self,
-                    "Error",
-                    f"Failed to delete proctor: {msg}"
-                )

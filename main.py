@@ -1,3 +1,6 @@
+import sys
+import logs
+import logging
 from PyQt6.QtWidgets import QApplication, QMainWindow, QWidget, QHBoxLayout, QSplitter
 from PyQt6.QtCore import Qt, QTimer
 from frontend.toolbar import Toolbar
@@ -7,8 +10,6 @@ from frontend.report_list import ReportList
 from backend.auth import AdminLoginDialog
 from backend.db import Database
 from themes.theme import apply_fusion_dark_theme
-import sys
-import logs
 
 class AdminMainWindow(QMainWindow):
     def __init__(self, db):
@@ -86,6 +87,14 @@ class AdminMainWindow(QMainWindow):
 
 def main():
     logs.setup_logger()
+    def log_unhandled_exception(exc_type, exc_value, exc_traceback):
+        logging.critical(
+            "Unhandled exception",
+            exc_info=(exc_type, exc_value, exc_traceback)
+        )
+
+    sys.excepthook = log_unhandled_exception
+
     app = QApplication(sys.argv)
     apply_fusion_dark_theme(app)
     db = Database()
