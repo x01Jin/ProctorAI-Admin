@@ -27,6 +27,15 @@ CREATE TABLE `reportlog` (
   CONSTRAINT `fk_reportlog_user` FOREIGN KEY (`user_id`) REFERENCES `users`(`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+CREATE TABLE modelapi (
+  id INT PRIMARY KEY AUTO_INCREMENT,
+  api_key VARCHAR(255) NOT NULL,
+  project VARCHAR(255) NOT NULL,
+  model_version VARCHAR(50) NOT NULL,
+  model_classes TEXT NOT NULL,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
 -- sample admin user with a hashed password of 'administrator'
 -- Note: The password is hashed using SHA256.
 -- username: admin

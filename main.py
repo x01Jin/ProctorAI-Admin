@@ -4,6 +4,7 @@ from frontend.toolbar import Toolbar
 from frontend.proctor_list import ProctorList
 from frontend.proctor_profile import ProctorProfile
 from frontend.report_list import ReportList
+from frontend.roboflow_settings import RoboflowSettingsDialog
 from backend.auth import AdminLoginDialog
 from backend.db import Database
 from themes.theme import apply_fusion_dark_theme
@@ -62,6 +63,7 @@ class AdminMainWindow(QMainWindow):
         
         self.proctor_list.proctor_selected.connect(self._on_proctor_selected)
         self.toolbar.add_proctor_requested.connect(self.proctor_list.open_add_dialog)
+        self.toolbar.settings_requested.connect(self._open_roboflow_settings)
         
         current_item = self.proctor_list.currentItem()
         if current_item:
@@ -72,6 +74,9 @@ class AdminMainWindow(QMainWindow):
         self.proctor_profile.display_proctor(proctor_id)
         self.report_list.display_reports(proctor_id)
 
+    def _open_roboflow_settings(self):
+        dialog = RoboflowSettingsDialog(self.db, self)
+        dialog.exec()
 
 def main():
     logs.setup_logger()

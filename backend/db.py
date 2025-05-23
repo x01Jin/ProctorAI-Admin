@@ -93,3 +93,24 @@ class Database:
         with self._connection.cursor(dictionary=True) as cursor:
             cursor.execute("SELECT * FROM users WHERE user_role = 'admin'")
             return cursor.fetchall()
+
+    def get_roboflow_settings(self):
+        if not self.is_connected():
+            return None
+        with self._connection.cursor(dictionary=True) as cursor:
+            cursor.execute("SELECT * FROM modelapi ORDER BY id DESC LIMIT 1")
+            return cursor.fetchone()
+
+    def update_roboflow_settings(self, api_key, project, model_version, model_classes):
+        if not self.is_connected():
+            return False
+        with self._connection.cursor() as cursor:
+            cursor.execute(
+                "DELETE FROM modelapi"
+            )
+            cursor.execute(
+                "INSERT INTO modelapi (api_key, project, model_version, model_classes) VALUES (%s, %s, %s, %s)",
+                (api_key, project, model_version, model_classes)
+            )
+            self._connection.commit()
+            return True
